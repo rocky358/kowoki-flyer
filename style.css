@@ -1,0 +1,416 @@
+*, *::before, *::after { box-sizing: border-box; }
+* { margin: 0; padding: 0; }
+
+/* * { border: 1px solid red; } */
+
+/* ---- Design tokens: every spacing value is a multiple of 8 (the 8pt grid) ---- */
+:root {
+  /* ---- Colour ---- */
+  --ink:    #17181b;
+  --paper:  #f6f5f2;
+  --card:   rgb(222, 222, 222);
+  --line:   #dcdad4;
+  --muted:  #6b6c70;
+  --accent: #ffd42aff;
+  /* --flyer-color-0: #ccff00ff; */
+  /* --flyer-color-1:   #55ddffff; */
+
+  /* ---- Spacing: 8pt grid, expressed in rem so it scales with
+          the user's font-size preference. 1rem = 16px by default. ---- */
+  --space-1: 0.5rem;   /*  8px */
+  --space-2: 1rem;     /* 16px */
+  --space-3: 1.5rem;   /* 24px */
+  --space-4: 2rem;     /* 32px */
+  --space-6: 3rem;     /* 48px */
+
+  /* ---- Fixed visual details: deliberately px, they should NOT
+          scale with text size. ---- */
+  --radius:      12px;
+  --border-hair: 1px;
+
+  /* ---- Layout ---- */
+  --header-h: 3.5rem;
+  --gutter:   var(--space-2);
+  --wrap:     90rem;
+  --measure:  40rem;
+
+  /* ---- Fluid type scale — every step locks at the SAME two widths (320px / 1120px)
+     so the ratios between levels stay coherent at every viewport size.
+     Mobile ratio ≈ 1.2 (minor third) · Desktop ratio ≈ 1.33 (perfect fourth) ---- */
+  --text-body: clamp(1rem,      0.95rem   + 0.25vw,  1.125rem); /* 16 → 18 */
+  --text-h3:   clamp(1.1875rem, 1.0625rem + 0.625vw, 1.5rem);   /* 19 → 24 */
+  --text-h2:   clamp(1.4375rem, 1.2125rem + 1.125vw, 2rem);     /* 23 → 32 */
+  --text-h1:   clamp(1.75rem,   1.4rem    + 1.75vw,  2.625rem); /* 28 → 42 */
+}
+
+html {
+  scroll-behavior: smooth;
+  font-size: 100%;
+}
+
+.site-header {
+  display: flex;
+  justify-content: center;
+  position: fixed;
+  z-index: 10;
+  inset-block-start: 0;
+  inset-inline: 0;
+  height: var(--header-h);
+  background: var(--paper);
+  border-block-end: var(--border-hair) solid var(--line);
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-inline: var(--gutter);
+  gap: var(--space-2);
+  width: 100%;
+  max-width: var(--wrap);
+  /* outline: 2px solid red; */
+}
+
+.wordmark {
+  font-size: clamp(1.25rem, 1rem + 1.5vw, 2rem);
+  line-height: 1;
+  color: var(--ink);
+  font-weight: 700;
+  text-decoration: none;
+  border-radius: var(--radius);
+}
+
+.wordmark:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.nav-group {
+display: flex;
+align-items: center;
+gap: var(--space-3);
+}
+
+.site-header nav {
+  display: flex;
+  gap: var(--space-1);
+  /* outline: 2px solid blue; */
+}
+
+.site-header nav a {
+  display: flex;
+  align-items: center;
+  min-height: 2.75rem;
+  padding-inline: var(--space-1);
+  font-size: 0.9375rem;
+  text-decoration: none;
+  color: var(--ink);
+  border-radius: var(--radius);
+  /* outline: 2px solid green; */
+}
+
+.site-header nav a:hover { 
+  background: rgba(0, 0, 0, 0.05); 
+}
+
+.site-header nav a:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* ---- Language switcher: EN / DE. The current language renders as plain
+        text (not a link) so people never click something that does nothing. ---- */
+.lang-switch {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding-inline-start: var(--space-3);
+  border-inline-start: var(--border-hair) solid var(--line);
+  font-size: 0.875rem;
+}
+
+.lang-switch a,
+.lang-switch span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2rem;
+  min-height: 2.75rem;
+  padding-inline: var(--space-1);
+  border-radius: var(--radius);
+  text-decoration: none;
+  color: var(--ink);
+}
+
+.lang-switch a:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.lang-switch a:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.lang-switch span[aria-current="page"] {
+  font-weight: 700;
+  color: var(--muted);
+  cursor: default;
+}
+
+.scroll-container { /* <main></main> */
+  height: 100dvh; 
+  overflow-y: scroll;
+  color: var(--ink);
+  font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+  line-height: 1.6;
+}
+
+.scroll-section {
+  display: flex;
+  flex-direction: column;
+  justify-content: safe center;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 100dvh;
+  padding: calc(var(--header-h) + var(--space-3)) var(--gutter) var(--space-4); /* top | left-right | bottom */
+}
+
+/* ---- All headings share the SAME column as .about-text, so every left/right
+   edge on the page lines up. One token = one edge = no drift. ---- */
+.scroll-section :is(h1, h2, h3) {
+  width: 100%;
+  max-width: var(--measure);
+  margin-inline: auto;
+  margin-block: 0;          /* the flex `gap` on the parent owns all vertical space */
+  text-align: center;
+  text-wrap: pretty;
+  color: var(--ink);
+}
+
+.scroll-section h1 {
+  font-size: var(--text-h1);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.02em; /* em <=> "tighten each gap by 2% of this text's own size." */
+}
+
+.scroll-section h2 {
+  font-size: var(--text-h2);
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+}
+
+.scroll-section h3 {
+  font-size: var(--text-h3);
+  font-weight: 600;
+  line-height: 1.35;
+  letter-spacing: 0.01em;
+  color: var(--muted);      /* was var(--color-text-muted) — undefined */
+  text-align: left;
+}
+
+/* ---- Looks like a hero, is semantically a section heading.
+   Use this instead of reaching for a second <h1>. ---- */
+.scroll-section h2.display {
+  font-size: var(--text-h1);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+/* ---- Only if a heading contains multiple <span> lines that need a gap between
+   them. Drop the class entirely if your headings are plain text — flex adds
+   nothing there and interferes with text-wrap. ---- */
+.scroll-section :is(h1, h2).is-stacked {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.about-text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  width: 100%;
+  max-width: var(--measure);
+  font-size: 1rem;
+  text-align: start;
+  text-wrap: pretty;   /* stops single-word orphans on the last line */
+  hyphens: auto;
+}
+
+.about-text strong {
+  font-weight: 700;
+  color: var(--ink);
+}
+
+/* ---- Keeps a value and its unit on the same line. ---- */
+.nowrap { white-space: nowrap; }
+
+/* ---- The qualifying-criteria card ---- */
+.fit-check {
+  padding: var(--space-3);
+  background: var(--card);
+  border: var(--border-hair) solid var(--line);
+  border-radius: var(--radius);
+}
+
+.fit-check h3 {
+  margin-block-end: var(--space-2);
+  text-align: start;   /* `start` rather than `left`: correct if you ever ship RTL */
+  color: var(--ink);   /* full contrast inside the card, not --muted */
+}
+
+.fit-check ul {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding-inline-start: var(--space-3);  /* room for the markers */
+}
+
+.fit-check li::marker { color: var(--ink); }
+
+/* ---- The caveat ---- */
+.note {
+  padding-inline-start: var(--space-2);
+  border-inline-start: 3px solid var(--line);
+  color: var(--muted);
+  font-size: 0.9375rem;
+}
+
+.note--warning {
+  color: #b3261e;
+  background-color: #fdf3f2;
+}
+
+/* ---- Mobile: full-width target — easier to hit with a thumb. ---- */
+.about-text .contact-link {
+  align-self: stretch;
+}
+
+.about-text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  width: 100%;
+  max-width: var(--measure);
+  font-size: 1rem;
+  text-align: start;
+  hyphens: auto;
+}
+
+.scroll-section--about, 
+.scroll-section--contact { 
+  background-color: var(--paper); 
+}
+
+.contact-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  text-align: center;
+}
+
+.contact-info address {
+  font-style: normal;
+}
+
+.contact-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.75rem;
+  padding: var(--space-1) var(--space-3);
+  background: var(--accent);
+  color: var(--ink);
+  font-size: 1rem;
+  text-decoration: none;
+  border-radius: var(--radius);
+  overflow-wrap: anywhere;
+}
+
+.contact-link:hover { opacity: 0.9; }
+
+.contact-link:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+.site-footer {
+  display: flex;
+  justify-content: center;
+  padding: var(--space-4) var(--gutter);
+  background: var(--paper);
+  border-block-start: var(--border-hair) solid var(--line);
+  color: var(--muted);
+  font-size: 0.875rem;
+}
+
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* ---- Polish: a gentle lift on hover — but only for people who haven't asked
+        their system to reduce motion (accessibility). ---- */
+@media (prefers-reduced-motion: no-preference) {
+  .site-header nav a { 
+    transition: background-color 150ms ease; 
+  }
+
+  .contact-link { 
+    transition: opacity 150ms ease; 
+  }
+
+  .lang-switch a {
+    transition: background-color 150ms ease;
+  }
+}
+
+@media (min-width: 48rem) {
+  :root {
+    --header-h: 4.5rem;
+    --gutter:   var(--space-4);
+  }
+  
+  .about-text { 
+    font-size: 1.125rem; 
+  }
+
+  .contact-info { 
+    font-size: 1.125rem; 
+  }
+
+  .contact-link { 
+    font-size: 1.125rem; padding-inline: var(--space-4); 
+  }
+
+  .about-text .contact-link {
+    align-self: start;
+  }
+}
+
+@media (min-width: 64rem) {
+  :root {
+    --gutter: var(--space-6);
+  }
+}
+
+/*
+
+For Reference:
+
+https://css-tricks.com/snippets/css/a-guide-to-flexbox/ 
+
+Base = mobile. No media query needed.
+@media (min-width: 40em)  {  640px — big phones / small tablets  }
+@media (min-width: 48em)  {  768px — tablets  }
+@media (min-width: 64em)  {  1024px — laptops }
+@media (min-width: 80em)  { 1280px — desktops } 
+
+*/
